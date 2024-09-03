@@ -1,35 +1,60 @@
 <?php
- require "./user/config.php";
-
-session_start();
+ require_once __DIR__."/config/support.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $login = new LoginController;
+
     $username = $_POST["username"];
-    $password = md5($_POST["password"]);
+    $password = $_POST["password"];
 
-    $sql = "SELECT * FROM tb_user WHERE username='$username'";
-    $result = mysqli_query($koneksi, $sql);
-    $row = mysqli_fetch_array($result);
+    $cek = $login->login($username, $password);
 
-    if ($row) {
-        if ($row["password"] === $password) {
-            $_SESSION['username'] = $username;
-            $_SESSION['level'] = $row["level"];
+    if($cek['status'] == true)
+    {
+        session_start();
+        
+        $_SESSION['username'] = $username;
+        $_SESSION['level'] = $row["level"];
 
-            if ($row["level"] == "0") {
-                header("Location: ./user/sidebar.php");
-                exit();
-            } else {
-                header("Location: ./Admin/db_admin.php");
-                exit();
-            }
-        } else {
-            $error[] = 'Password Salah';
+        if ($row["level"] == "0") {
+            header("Location: ./user/sidebar.php");
+            exit();
+        } 
+        else {
+            header("Location: ./Admin/db_admin.php");
+            exit();
         }
-    } else {
-        $error[] = 'Username Tidak Ditemukan';
+    } 
+    else {
+            $error[] = 'Password Salah';
     }
 }
+
+    
+
+    // $sql = "SELECT * FROM tb_user WHERE username='$username'";
+    // $result = mysqli_query($koneksi, $sql);
+    // $row = mysqli_fetch_array($result);
+
+    // if ($row) {
+    //     if ($row["password"] === $password) {
+    //         $_SESSION['username'] = $username;
+    //         $_SESSION['level'] = $row["level"];
+
+    //         if ($row["level"] == "0") {
+    //             header("Location: ./user/sidebar.php");
+    //             exit();
+    //         } else {
+    //             header("Location: ./Admin/db_admin.php");
+    //             exit();
+    //         }
+    //     } else {
+    //         $error[] = 'Password Salah';
+    //     }
+    // } else {
+    //     $error[] = 'Username Tidak Ditemukan';
+    // }
+// }
 ?>
 
 <!doctype html>
