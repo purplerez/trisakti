@@ -1,7 +1,9 @@
 <?php 
-include "../config/koneksi.php";
-include "../Controller/JenistiketController.php";
-include "data.php";
+// include "../config/koneksi.php";
+// include "../Controller/JenistiketController.php";
+
+require_once __DIR__."/../../config/support.php";
+require_once "data.php";
 
 ?>
 

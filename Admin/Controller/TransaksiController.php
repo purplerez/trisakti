@@ -1,11 +1,13 @@
 <?php 
 class TransaksiController{
+    private $conn; 
+    
     public function __construct()
     {
         $db = new DatabaseConnection;
         $this->conn = $db->conn;
     }
-    public function index(  ){
+    public function index( ){
         $query = "SELECT * from tb_jenistiket";
 
         $result = $this->conn->query($query);

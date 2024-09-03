@@ -1,12 +1,10 @@
 <?php 
 // include "../config/koneksi.php";
 // include "./Controller/JenistiketController.php";
-// include "./adm/data.php";
-
-include "support.php";
-
 session_start();
+require_once __DIR__."/../config/support.php";
 require '../user/session_check.php';
+include "./adm/data.php";
 
 ?>
 

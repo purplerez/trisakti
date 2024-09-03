@@ -1,13 +1,17 @@
 <?php
- require "../user/config.php";
+ require_once __DIR__."/../config/support.php";
 
 session_start();
 require '../user/session_check.php';
 
 $error = [];
 $success = "";
+$db= new DatabaseConnection;
+$koneksi = $db->conn;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+ 
+
     $username = $_POST['username'];
     $pass_lama = md5($_POST['pass_lama']);
     $pass_baru = md5($_POST['pass_baru']);
@@ -46,7 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['username'])) {
     $username = $_GET['username'];
     $query = "SELECT * FROM tb_user WHERE username = '$username'";
-    $result = mysqli_query($koneksi, $query);
+    $result = $koneksi->query($query);
+    // mysqli_query($koneksi, );
     if (!$result) {
         die("Query error: " . mysqli_errno($koneksi) . " - " . mysqli_error($koneksi));
     }

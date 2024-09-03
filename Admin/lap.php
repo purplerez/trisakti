@@ -1,8 +1,8 @@
 <?php 
-include "support.php";
-
 session_start();
+require_once __DIR__."/../config/support.php";
 require '../user/session_check.php';
+include "./adm/data.php";
 
 $transaksi = new TransaksiController;
 ?>
@@ -124,7 +124,7 @@ $transaksi = new TransaksiController;
                             <td><?= $rec['jam'] ?></td>
                             <td><?= $rec['pelabuhan'] ?></td>
                             <td><?= $rec['trip'] ?></td>
-                            <td>Rp <?= number_format($rec['total_pendapatan'], 0, ',', '.') ?></td>
+                            <td>Rp. <?= number_format($rec['total_pendapatan'] ?? 0, 0, ',', '.') ?></td>
                                 <form action="edit.php" method="post">
                                 <input type="hidden" name="id" value="<?= $rec['id'] ?>" />
                             <td><input type="submit" value="Edit" name="editJenis" class="btn btn-primary"></td>

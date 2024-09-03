@@ -1,9 +1,8 @@
 <?php 
-
-include "support.php";
-
 session_start();
+require_once __DIR__."/../config/support.php";
 require '../user/session_check.php';
+include "./adm/data.php";
 
 $transaksi = new TransaksiController;
 
