@@ -7,8 +7,8 @@ class TransaksiController{
         $db = new DatabaseConnection;
         $this->conn = $db->conn;
     }
-    public function index( ){
-        $query = "SELECT * from tb_jenistiket";
+    public function index(){
+        $query = "SELECT id, nama_tiket, tarif FROM tb_jenistiket";
 
         $result = $this->conn->query($query);
 
