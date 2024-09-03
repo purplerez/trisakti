@@ -15,9 +15,9 @@ class JenistiketController {
         $tarif = $data['tarif'];
         $status = $data['status'];
 
-        $stat = $this->conn->prepare("INSERT INTO tb_jenistiket (nama_tiket, tarif, status) VALUES (?,?,?)");
+        $stat = $this->conn->prepare("INSERT INTO tb_jenistiket (nama_tiket, tarif, `status`) VALUES (?,?,?)");
         // echo "INSERT INTO tb_jenistiket (nama_tiket, tarif) VALUES ('$nama_tiket',$tarif)";
-        $stat->bind_param("sii", $nama_tiket, $tarif, $status);
+        $stat->bind_param("sis", $nama_tiket, $tarif, $status);
 
         $result = $stat->execute();
         $stat->close();
