@@ -1,5 +1,4 @@
 <?php 
-
 $conn = new DatabaseConnection;
 $jenistiket = new JenistiketController;
 $transaksi = new TransaksiController;
@@ -8,7 +7,7 @@ $uname = new UserController;
 if(isset($_POST['addTiket'])){
     $nama_tiket = $_POST['nama_tiket'];
     $tarif = $_POST['tarif'];
-    $status = $_POST['status'];
+    $status = (int)$_POST['status'];
 
     $data = [
         'nama_tiket' => $nama_tiket,
@@ -17,7 +16,7 @@ if(isset($_POST['addTiket'])){
     ];
 
     $result = $jenistiket->create($data);
-
+    
     if($result) header("location:master.php?status=1");
     else header("location:master.php?status=0");
 }
