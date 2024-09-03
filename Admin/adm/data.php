@@ -100,7 +100,8 @@ else if(isset($_POST['setPass'])) {
 
 else if(isset($_POST['inputTransaksi'])){
 
-    $tanggal = $_POST['tgl'];
+    $tanggal = date('Y-m-d', strtotime($_POST['tgl']));
+    
     $waktu = $_POST['waktu'];
     $pelabuhan = isset($_POST['pelabuhan']) ? $_POST['pelabuhan'] : ''; 
     $trip = $_POST['trip'];
