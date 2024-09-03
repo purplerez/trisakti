@@ -149,7 +149,7 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                         <tbody>
                         <?php 
                         $no = 1;
-                        while($rec = $stmt->fetch_assoc()) {
+                        while($rec = $transaksi->index()) {
                             // Example condition to check for Golongan VII
                             if ($rec['nama_tiket'] === 'Golongan VII') {
                                 ?>
