@@ -4,7 +4,7 @@ class DatabaseConnection {
     protected $server = 'localhost';
     protected $user = 'root_rez';
     protected $pass = 'ires123';
-    protected $db = 'trimas_db';
+    protected $db = 'trisakti';
 
     public $conn;
 
