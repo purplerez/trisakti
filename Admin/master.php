@@ -97,7 +97,7 @@ include "./adm/data.php";
 
                 <div class="row">
                     <div class="col-sm-7">
-                        <form method="post">
+                        <form action="" method="post">
                             <?php 
                                 if(isset($_POST['editJenis'])){
                                     $id_edit = $_POST['id'];
@@ -121,7 +121,7 @@ include "./adm/data.php";
                                 <input type="number" name="tarif" id="" placeholder="0000000" value="<?= htmlspecialchars($tarif) ?>" class="form-control"> 
                             </div>
                             <div class="mb-3">
-                                <label for="jenistiket" class="form-label">Jenis Tiker</label>
+                                <label for="jenistiket" class="form-label">Jenis Tiket</label>
                                 <select name="status" id="" class="form-control">
                                     <option value="1">Pemasukan</option>
                                     <option value="0">Pengeluaran</option>
