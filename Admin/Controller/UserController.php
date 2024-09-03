@@ -1,6 +1,7 @@
 <?php
 class UserController {
-
+    private $conn;
+    
     public function __construct()
     {
         $db = new DatabaseConnection;
