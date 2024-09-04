@@ -149,12 +149,12 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                         <tbody>
                         <?php 
                         $no = 1;
-                        while($rec = $transaksi->index()) {
+                        foreach($transaksi->index() as $rec) {
                             // Example condition to check for Golongan VII
                             if ($rec['nama_tiket'] === 'Golongan VII') {
                                 ?>
                                 <tr>
-                                    <td colspan="4">Subtotal</td>
+                                    <td colspan="4">Subtotal </td>
                                     <td id="subtotal">Rp 0</td>
                                 </tr>
                                 <?php
@@ -180,20 +180,37 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                         <th colspan="3">Subtotal</th>
                         <th id="total-pendapatan">Rp 0</th>
                     </tr>
+                    <?php 
+                        foreach($transaksi->index(0) as $data) {
+                    ?>
                     <tr>
                         <td><?= $no++ ?></td>
-                        <td>Bea Cetak</td>
-                        <td>90</td>
-                        <td id="total-produksi-bea-cetak">0</td>
-                        <td id="total-bea-cetak">Rp 0</td>
+                        <td><?= $data['nama_tiket'] ?></td>
+                        
+                        <?php 
+                            if($data['nama_tiket'] == 'Bea Cetak'){
+                        ?>
+                        <td> Rp  <?= number_format($data['tarif'], 0, ',', '.') ?></td>
+                            <td id="total-produksi-bea-cetak">0</td>
+                            <td id="total-bea-cetak">Rp 0</td>
+                        <?php } 
+                        else { ?>
+                        <td> Rp  <?= number_format($data['tarif'], 0, ',', '.') ?></td>
+                            <td><input type="number" id="total-produksi-bea-sandar"></td>
+                            <td id="total-bea-sandar">Rp 0</td>
+                        <?php 
+                        } 
+                        ?>
+                        
                     </tr>
-                    <tr>
+                    <?php } ?>
+                    <!-- <tr>
                         <td><?= $no++ ?></td>
                         <td>Bea Sandar</td>
                         <td id="beasandar-value">345.690</td>
                         <td><input type="number" id="total-produksi-bea-sandar"></td>
-                        <td id="total-bea-sandar">Rp 0</td>
-                    </tr>
+                        
+                    </tr> -->
                     <tr>
                         <th></th>
                         <th colspan="3">Total Pendapatan</th>
