@@ -238,19 +238,17 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
     <script src="side.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-    // Event listener untuk input produksi
+   
     document.querySelectorAll('.produksi-input').forEach(function(input) {
         input.addEventListener('input', hitungTotal);
     });
 
-    // Event listener untuk input Bea Sandar
     document.getElementById('total-produksi-bea-sandar').addEventListener('input', hitungTotal);
 
     function hitungTotal() {
         let totalPendapatan = 0;
         let totalProduksi = 0;
-
-        // Hitung total pendapatan dan total produksi
+        
         document.querySelectorAll('.produksi-input').forEach(function(input) {
             let tarif = parseFloat(input.getAttribute('data-tarif'));
             let produksi = parseFloat(input.value) || 0;
@@ -261,7 +259,7 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
         });
 
         // Bea Cetak
-        let beaCetakPerProduksi = 90; // Nilai tetap per produksi untuk Bea Cetak
+        let beaCetakPerProduksi = 90; 
         let beaCetak = beaCetakPerProduksi * totalProduksi;
 
         // Bea Sandar
@@ -275,7 +273,6 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
         // Hitung total keseluruhan
         let totalKeseluruhan = totalPendapatan - totalBiaya;
 
-        // Update tampilan
         document.getElementById('total-pendapatan').innerText = 'Rp ' + totalPendapatan.toLocaleString();
         document.getElementById('total-produksi-bea-cetak').innerText = totalProduksi;
         document.getElementById('total-bea-cetak').innerText = 'Rp ' + beaCetak.toLocaleString();
@@ -283,7 +280,6 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
         document.getElementById('total-keseluruhan').innerText = 'Rp ' + totalKeseluruhan.toLocaleString();
     }
 
-    // Inisialisasi kalkulasi saat halaman dimuat
     hitungTotal();
 });
 </script>
