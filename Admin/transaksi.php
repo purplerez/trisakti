@@ -238,51 +238,35 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
     <script src="side.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-   
+    // Event listener for input production fields
     document.querySelectorAll('.produksi-input').forEach(function(input) {
-        input.addEventListener('input', hitungTotal);
+        input.addEventListener('input', calculateTotals);
     });
 
-    document.getElementById('total-produksi-bea-sandar').addEventListener('input', hitungTotal);
+    function calculateTotals() {
+        let subtotal = 0;
+        let totalProduction = 0;
 
-    function hitungTotal() {
-        let totalPendapatan = 0;
-        let totalProduksi = 0;
-        
+        // Calculate subtotal and total production for ticket types
         document.querySelectorAll('.produksi-input').forEach(function(input) {
             let tarif = parseFloat(input.getAttribute('data-tarif'));
-            let produksi = parseFloat(input.value) || 0;
-            let total = tarif * produksi;
+            let production = parseFloat(input.value) || 0;
+            let total = tarif * production;
             input.closest('tr').querySelector('.pendapatan').innerText = 'Rp ' + total.toLocaleString();
-            totalPendapatan += total;
-            totalProduksi += produksi;
+            subtotal += total;
+            totalProduction += production;
         });
 
-        // Bea Cetak
-        let beaCetakPerProduksi = 90; 
-        let beaCetak = beaCetakPerProduksi * totalProduksi;
-
-        // Bea Sandar
-        let beaSandarRate = parseFloat(document.getElementById('beasandar-value').innerText.replace(/[^0-9]/g, '')) || 0;
-        let beaSandarInput = parseFloat(document.getElementById('total-produksi-bea-sandar').value) || 0;
-        let beaSandar = beaSandarRate * beaSandarInput;
-
-        // Hitung total biaya
-        let totalBiaya = beaCetak + beaSandar;
-
-        // Hitung total keseluruhan
-        let totalKeseluruhan = totalPendapatan - totalBiaya;
-
-        document.getElementById('total-pendapatan').innerText = 'Rp ' + totalPendapatan.toLocaleString();
-        document.getElementById('total-produksi-bea-cetak').innerText = totalProduksi;
-        document.getElementById('total-bea-cetak').innerText = 'Rp ' + beaCetak.toLocaleString();
-        document.getElementById('total-bea-sandar').innerText = 'Rp ' + beaSandar.toLocaleString();
-        document.getElementById('total-keseluruhan').innerText = 'Rp ' + totalKeseluruhan.toLocaleString();
+        document.getElementById('total-pendapatan').innerText = 'Rp ' + subtotal.toLocaleString();
+        
+        let totalRevenue = subtotal - totalBeaCetak - totalBeaSandar;
+        document.getElementById('total-keseluruhan').innerText = 'Rp ' + totalRevenue.toLocaleString();
     }
 
-    hitungTotal();
+    calculateTotals();
 });
 </script>
+
 
 </body>
 </html>
