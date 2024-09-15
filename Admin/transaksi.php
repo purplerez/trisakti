@@ -190,12 +190,12 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                         <?php 
                             if($data['nama_tiket'] == 'Bea Cetak'){
                         ?>
-                        <td> Rp  <?= number_format($data['tarif'], 0, ',', '.') ?></td>
+                        <td id="tarif-bea-cetak"> Rp  <?= number_format($data['tarif'], 0, ',', '.') ?></td>
                             <td id="total-produksi-bea-cetak">0</td>
                             <td id="total-bea-cetak">Rp 0</td>
                         <?php } 
                         else { ?>
-                        <td> Rp  <?= number_format($data['tarif'], 0, ',', '.') ?></td>
+                        <td id="tarif-bea-sandar"> Rp  <?= number_format($data['tarif'], 0, ',', '.') ?></td>
                             <td><input type="number" id="total-produksi-bea-sandar"></td>
                             <td id="total-bea-sandar">Rp 0</td>
                         <?php 
@@ -236,37 +236,141 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
         crossorigin="anonymous"></script>
 
     <script src="side.js"></script>
-    <script>
+    <!-- <script>
     document.addEventListener('DOMContentLoaded', function () {
-    // Event listener for input production fields
+    // Event listener untuk input produksi
+    document.querySelectorAll('.produksi-input').forEach(function(input) {
+        input.addEventListener('input', hitungTotal);
+    });
+
+    // Event listener untuk input Bea Sandar
+    document.getElementById('total-produksi-bea-sandar').addEventListener('input', hitungTotal);
+
+    function hitungTotal() {
+        let totalPendapatan = 0;
+        let totalProduksi = 0;
+
+        // Hitung total pendapatan dan total produksi
+        document.querySelectorAll('.produksi-input').forEach(function(input) {
+            let tarif = parseFloat(input.getAttribute('data-tarif'));
+            let produksi = parseFloat(input.value) || 0;
+            let total = tarif * produksi;
+            input.closest('tr').querySelector('.pendapatan').innerText = 'Rp ' + total.toLocaleString();
+            totalPendapatan += total;
+            totalProduksi += produksi;
+        });
+
+        // Bea Cetak
+        let beaCetakPerProduksi = 90; // Nilai tetap per produksi untuk Bea Cetak
+        let beaCetak = beaCetakPerProduksi * totalProduksi;
+
+        // Bea Sandar
+        let beaSandarRate = parseFloat(document.getElementById('beasandar-value').innerText.replace(/[^0-9]/g, '')) || 0;
+        let beaSandarInput = parseFloat(document.getElementById('total-produksi-bea-sandar').value) || 0;
+        let beaSandar = beaSandarRate * beaSandarInput;
+
+        // Hitung total biaya
+        let totalBiaya = beaCetak + beaSandar;
+
+        // Hitung total keseluruhan
+        let totalKeseluruhan = totalPendapatan - totalBiaya;
+
+        // Update tampilan
+        document.getElementById('total-pendapatan').innerText = 'Rp ' + totalPendapatan.toLocaleString();
+        document.getElementById('total-produksi-bea-cetak').innerText = totalProduksi;
+        document.getElementById('total-bea-cetak').innerText = 'Rp ' + beaCetak.toLocaleString();
+        document.getElementById('total-bea-sandar').innerText = 'Rp ' + beaSandar.toLocaleString();
+        document.getElementById('total-keseluruhan').innerText = 'Rp ' + totalKeseluruhan.toLocaleString();
+    }
+
+    // Inisialisasi kalkulasi saat halaman dimuat
+    hitungTotal();
+});
+</script> -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Event listener untuk input produksi
     document.querySelectorAll('.produksi-input').forEach(function(input) {
         input.addEventListener('input', calculateTotals);
     });
+    let produksiTotal = 0; // Inisialisasi produksiTotal dengan 0
+    let beacetak = 0;
+    let beasandar = 0;
+
+    // Listener untuk input Bea Sandar
+    document.getElementById('total-produksi-bea-sandar').addEventListener('input', calculateBeaSandar);
+
+    // Tarif Bea Cetak dan Bea Sandar (konversi ke angka)
+    const tarifBeaCetak = parseFloat(document.getElementById('tarif-bea-cetak').innerText.replace(/[Rp. ]/g, '')) || 0;
+    const tarifBeaSandar = parseFloat(document.getElementById('tarif-bea-sandar').innerText.replace(/[Rp. ]/g, '')) || 0;
 
     function calculateTotals() {
         let subtotal = 0;
-        let totalProduction = 0;
+        produksiTotal = 0; // Reset produksiTotal setiap kali fungsi dipanggil
+        
 
-        // Calculate subtotal and total production for ticket types
+        // Perhitungan subtotal tiket
         document.querySelectorAll('.produksi-input').forEach(function(input) {
             let tarif = parseFloat(input.getAttribute('data-tarif'));
             let production = parseFloat(input.value) || 0;
             let total = tarif * production;
+
+            // Set pendapatan ke dalam elemen
             input.closest('tr').querySelector('.pendapatan').innerText = 'Rp ' + total.toLocaleString();
+
+            // Hitung subtotal
             subtotal += total;
-            totalProduction += production;
+
+            // Tambahkan nilai produksi ke produksiTotal
+            produksiTotal += production;
         });
 
+        // Set subtotal tiket
         document.getElementById('total-pendapatan').innerText = 'Rp ' + subtotal.toLocaleString();
-        
-        let totalRevenue = subtotal - totalBeaCetak - totalBeaSandar;
-        document.getElementById('total-keseluruhan').innerText = 'Rp ' + totalRevenue.toLocaleString();
+
+        // Tampilkan produksi total di dalam Bea Cetak
+        document.getElementById('total-produksi-bea-cetak').innerText = produksiTotal;
+
+        // Kalkulasi subtotal Bea Cetak
+        calculateBeaCetak();
+
+        // Kalkulasi total keseluruhan
+        calculateGrandTotal(subtotal);
     }
 
+    function calculateBeaCetak() {
+        // Gunakan produksiTotal dari calculateTotals
+        let totalBeaCetak = produksiTotal * tarifBeaCetak;
+        beacetak = totalBeaCetak;
+
+        // Set nilai total Bea Cetak
+        document.getElementById('total-bea-cetak').innerText = 'Rp ' + totalBeaCetak.toLocaleString();
+    }
+
+    function calculateBeaSandar() {
+        let produksiBeaSandar = parseFloat(document.getElementById('total-produksi-bea-sandar').value) || 0;
+        let totalBeaSandar = produksiBeaSandar * tarifBeaSandar;
+        beasandar = totalBeaSandar;
+
+        // Set nilai total Bea Sandar
+        document.getElementById('total-bea-sandar').innerText = 'Rp ' + totalBeaSandar.toLocaleString();
+    }
+
+    function calculateGrandTotal(subtotal = 0) {
+        let totalBeaCetak = parseFloat(document.getElementById('total-bea-cetak').innerText.replace(/[Rp. ]/g, '')) || 0;
+        let totalBeaSandar = parseFloat(document.getElementById('total-bea-sandar').innerText.replace(/[Rp. ]/g, '')) || 0;
+
+        let totalKeseluruhan = subtotal - (beacetak + beasandar);
+
+        // Set nilai total keseluruhan
+        document.getElementById('total-keseluruhan').innerText = 'Rp ' + totalKeseluruhan.toLocaleString();
+    }
+
+    // Mulai kalkulasi saat DOM siap
     calculateTotals();
 });
-</script>
 
+</script>
 
 </body>
 </html>
