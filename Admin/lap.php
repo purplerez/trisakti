@@ -22,6 +22,30 @@ $transaksi = new TransaksiController;
         integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <link rel="stylesheet" href="laporan.css">
 </head>
+<style>
+    @media print {
+        /* Sembunyikan seluruh sidebar dan elemen terkait saat print */
+        #sidebar,
+        .toggle-btn,
+        .sidebar-footer {
+            display: none !important;
+        }
+
+        /* Sesuaikan lebar konten utama agar memenuhi halaman saat print */
+        .main {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Atur ulang layout agar sesuai dengan format print */
+        .wrapper {
+            display: block !important;
+            margin: 0 !important;
+        }
+    }
+</style>
+
 <body>
 <div class="wrapper">
         <aside id="sidebar">
@@ -118,18 +142,23 @@ $transaksi = new TransaksiController;
                         $no = 1;
                         foreach($data as $rec) {
                         ?> 
-                        <tr>
+                         <tr>
                             <td><?= $no ?></td>
                             <td><?= $rec['tanggal'] ?></td>
                             <td><?= $rec['jam'] ?></td>
                             <td><?= $rec['pelabuhan'] ?></td>
                             <td><?= $rec['trip'] ?></td>
-                            <td>Rp. <?= number_format($rec['total_pendapatan'] ?? 0, 0, ',', '.') ?></td>
-                                <form action="edit.php" method="post">
-                                <input type="hidden" name="id" value="<?= $rec['id'] ?>" />
-                            <td><input type="submit" value="Edit" name="editJenis" class="btn btn-primary"></td>
+                            <td>Rp <?= number_format($rec['total_pendapatan'], 0, ',', '.') ?></td>
+                                <form action="excel.php" method="post">
+                                    <input type="hidden" name="id" value="<?= $rec['id'] ?>" />
+                                <td><input type="submit" value="Excel" name="download" class="btn btn-primary"></td>
+                                </form>
 
-                            <td><input type="submit" value="Download" name="download" class="btn btn-primary"></td>
+                                <form action="pdf.php?id=<?= $rec['id'] ?>" method="post">
+                                    <input type="hidden" name="id" value="<?= $rec['id'] ?>" />
+                                <td><input type="submit" value="Pdf" name="download" class="btn btn-primary"></td>
+                                </form>
+
                         </tr>
                         <?php $no++; } ?>
                     </tbody>
