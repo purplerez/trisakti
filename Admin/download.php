@@ -1,6 +1,6 @@
 <?php
 require '../vendor/autoload.php';
-include "support.php";
+require_once __DIR__."/../config/support.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
