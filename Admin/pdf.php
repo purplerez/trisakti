@@ -1,6 +1,6 @@
 <?php
 ob_start();
-include('config.php');
+require ('../user/config.php');
 require '../vendor/autoload.php';
 
 use Dompdf\Dompdf;
