@@ -292,15 +292,16 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     // Event listener untuk input produksi
-    document.querySelectorAll('.produksi-input').forEach(function(input) {
+    document.querySelectorAll('.produksi-input').forEach(function(input) {  
         input.addEventListener('input', calculateTotals);
     });
+
+    // Listener untuk input Bea Sandar
+    document.getElementById('total-produksi-bea-sandar').addEventListener('input', calculateTotals);
+
     let produksiTotal = 0; // Inisialisasi produksiTotal dengan 0
     let beacetak = 0;
     let beasandar = 0;
-
-    // Listener untuk input Bea Sandar
-    document.getElementById('total-produksi-bea-sandar').addEventListener('input', calculateBeaSandar);
 
     // Tarif Bea Cetak dan Bea Sandar (konversi ke angka)
     const tarifBeaCetak = parseFloat(document.getElementById('tarif-bea-cetak').innerText.replace(/[Rp. ]/g, '')) || 0;
@@ -309,7 +310,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function calculateTotals() {
         let subtotal = 0;
         produksiTotal = 0; // Reset produksiTotal setiap kali fungsi dipanggil
-        
 
         // Perhitungan subtotal tiket
         document.querySelectorAll('.produksi-input').forEach(function(input) {
@@ -332,10 +332,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Tampilkan produksi total di dalam Bea Cetak
         document.getElementById('total-produksi-bea-cetak').innerText = produksiTotal;
-        document.getElementById('produksiCetak').value = produksiTotal;
 
         // Kalkulasi subtotal Bea Cetak
         calculateBeaCetak();
+
+        // Kalkulasi Bea Sandar
         calculateBeaSandar();
 
         // Kalkulasi total keseluruhan
@@ -361,20 +362,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function calculateGrandTotal(subtotal = 0) {
-        let totalBeaCetak = parseFloat(document.getElementById('total-bea-cetak').innerText.replace(/[Rp. ]/g, '')) || 0;
-        let totalBeaSandar = parseFloat(document.getElementById('total-bea-sandar').innerText.replace(/[Rp. ]/g, '')) || 0;
-
-        let totalKeseluruhan = subtotal - (beacetak + beasandar);
+        // Total Grand adalah subtotal + beacetak + beasandar
+        let totalKeseluruhan = subtotal - beacetak - beasandar;
 
         // Set nilai total keseluruhan
         document.getElementById('total-keseluruhan').innerText = 'Rp ' + totalKeseluruhan.toLocaleString();
     }
 
-    // Mulai kalkulasi saat DOM siap
     calculateTotals();
 });
-
 </script>
-
 </body>
 </html>
