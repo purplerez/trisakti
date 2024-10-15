@@ -27,10 +27,18 @@ $sql_trans = "SELECT t.tanggal, t.jam, t.pelabuhan, t.trip, j.nama_tiket, j.tari
               FROM tb_transaksi AS t 
               JOIN tb_detail_trans AS d ON t.id = d.id_transaksi 
               JOIN tb_jenistiket AS j ON d.id_tiket = j.id
-              WHERE t.id = ?";
+              WHERE t.id = ? AND j.status = '1' ";
+
+$sql_trans_pengeluaran = "SELECT t.tanggal, t.jam, t.pelabuhan, t.trip, j.nama_tiket, j.tarif, d.produksi 
+                FROM tb_transaksi AS t 
+                JOIN tb_detail_trans AS d ON t.id = d.id_transaksi 
+                JOIN tb_jenistiket AS j ON d.id_tiket = j.id
+                WHERE t.id = ? AND j.status = '0' ";
 
 // Prepare statement
 $stmt = mysqli_prepare($koneksi, $sql_trans);
+$stmt_trans = mysqli_prepare($koneksi, $sql_trans_pengeluaran);
+
 
 if ($stmt) {
     mysqli_stmt_bind_param($stmt, "i", $id_transaksi);
@@ -113,27 +121,34 @@ if ($stmt) {
             <td></td>
             <td></td>
             <td style="text-align: center; padding-bottom: 10px;">Rp ' . number_format($subtotal, 0, ',', '.') . '</td>
-        </tr>
+        </tr>';
+
+        mysqli_stmt_bind_param($stmt_trans, "i", $id_transaksi);
+        mysqli_stmt_execute($stmt_trans);
+        $result_pengeluaran = mysqli_stmt_get_result($stmt_trans);
+        $total_keluar = 0;
+        $subtotal_keluar = 0; 
+        while ($rec = mysqli_fetch_array($result_pengeluaran)){
+            $total_keluar = $rec['tarif'] * $rec['produksi'];
+            $subtotal_keluar += $total_keluar;
+        $html .='
         <tr>
             <td style="text-align: center; padding-bottom: 10px;">' . $no++ . '</td>
-            <td style="padding-bottom: 10px;">Bea Cetak</td>
-            <td style="text-align: center; padding-bottom: 10px;">Rp 5.000</td>
-            <td style="text-align: center; padding-bottom: 10px;">2</td>
-            <td style="text-align: center; padding-bottom: 10px;">Rp 10.000</td>
-        </tr>
-        <tr>
-            <td style="text-align: center; padding-bottom: 10px;">' . $no++ . '</td>
-            <td style="padding-bottom: 10px;">Bea Sandar</td>
-            <td style="text-align: center; padding-bottom: 10px;">Rp 5.000</td>
-            <td style="text-align: center; padding-bottom: 10px;">2</td>
-            <td style="text-align: center; padding-bottom: 10px;">Rp 10.000</td>
-        </tr>
+            <td style="padding-bottom: 10px;">'. $rec['nama_tiket'] .'</td>
+            <td style="text-align: center; padding-bottom: 10px;">Rp '. number_format($rec['tarif'], 0, ',', '.') .'</td>
+            <td style="text-align: center; padding-bottom: 10px;">' . $rec['produksi'] . '</td>
+            <td style="text-align: center; padding-bottom: 10px;">'.number_format($total_keluar, 0, ',','.') .'</td>
+        </tr>';
+        }
+
+        $html .=
+        '
         <tr>
             <td></td>
             <td style="padding-bottom: 10px;">Total Pendapatan</td>
             <td></td>
             <td></td>
-            <td style="text-align: center; padding-bottom: 10px;">Rp ' . number_format($subtotal - 20000, 0, ',', '.') . '</td>
+            <td style="text-align: center; padding-bottom: 10px;">Rp ' . number_format($subtotal - $subtotal_keluar, 0, ',', '.') . '</td>
         </tr>
         </table>
         <p style="margin-top: 50px;">Yang membuat user</p>';
