@@ -105,9 +105,17 @@ class TransaksiController{
     } 
 
     public function edit($id){
-        $query = "SELECT * FROM tb_transaksi WHERE id = $id";
-        $result = $this->conn->query($query);
+        // $query = "SELECT * FROM tb_transaksi WHERE id = $id";
+        // $result = $this->conn->query($query);
 
+        $stat = $this->conn->prepare("SELECT * FROM tb_transaksi WHERE id = ?");
+        $stat->bind_param("i", $id);
+
+        $result = $stat->execute();
+        $stat->close();
+
+        if($result) return true;
+        else return false;
         // $query->close();
 
         if($result->num_rows>0) return $result;
@@ -126,6 +134,23 @@ class TransaksiController{
 
         if($result) return true;
         else return false; 
+    }
+
+    public function validasi($data){
+        foreach($data as $rec => $value)
+        {
+            $nilai = trim($value);
+            if((empty($nilai)) || $nilai == '' || $nilai = 0)
+                return $rec;
+        }
+
+        return 0;
+    }
+    public function validasiDetail($data1, $data2){
+        if(count($data1) != count($data2))
+            return false;
+        else 
+            return 0;
     }
     
 }

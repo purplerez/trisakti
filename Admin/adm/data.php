@@ -114,12 +114,23 @@ else if(isset($_POST['inputTransaksi'])){
         'pelabuhan' => $pelabuhan,
         'trip' => $trip
     ];
+    // var_dump($idjenis);
+    // echo "<br/>";
+    // var_dump($produksi);
+    // echo "<br/>";
+    $validasi = $transaksi->validasi($data);
+    $validasiDetail = $transaksi->validasiDetail($idjenis, $produksi);
 
-    $result = $transaksi->create($data, $idjenis, $produksi);
-
-    if($result) header("location:lap.php?status=1");
-    else header("location:transaksi.php?status=0"); 
-
+    if($validasi == 0 && $validasiDetail == 0) {
+        $result = $transaksi->create($data, $idjenis, $produksi);
+        header("location:lap.php?status=1");
+    }
+    else if($validasi != 0){
+        header("location:transaksi.php?error=missing_field&field=" . $validasi);
+    }
+    else {
+        header("location:transaksi.php?error=jenis_and_produksi_doesnt_match");
+    }
 }
 else if (isset($_POST['delLap'])){
     $id_lap = $_POST['id'];

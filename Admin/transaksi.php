@@ -190,13 +190,15 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                         <?php 
                             if($data['nama_tiket'] == 'Bea Cetak'){
                         ?>
-                        <td id="tarif-bea-cetak"> Rp  <?= number_format($data['tarif'], 0, ',', '.') ?></td>
+                        <td id="tarif-bea-cetak"> Rp  <?= number_format($data['tarif'], 0, ',', '.') ?> <input type="hidden" name="produksi[]" id="produksiCetak" value=""></td>
+                        <input type="hidden" name="idjenis[]" value="<?= $data['id'] ?>">
                             <td id="total-produksi-bea-cetak">0</td>
                             <td id="total-bea-cetak">Rp 0</td>
                         <?php } 
                         else { ?>
                         <td id="tarif-bea-sandar"> Rp  <?= number_format($data['tarif'], 0, ',', '.') ?></td>
-                            <td><input type="number" id="total-produksi-bea-sandar"></td>
+                            <td><input type="number" id="total-produksi-bea-sandar" name="produksi[]">
+                            <input type="hidden" name="idjenis[]" value="<?= $data['id'] ?>"></td>
                             <td id="total-bea-sandar">Rp 0</td>
                         <?php 
                         } 
@@ -330,9 +332,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Tampilkan produksi total di dalam Bea Cetak
         document.getElementById('total-produksi-bea-cetak').innerText = produksiTotal;
+        document.getElementById('produksiCetak').value = produksiTotal;
 
         // Kalkulasi subtotal Bea Cetak
         calculateBeaCetak();
+        calculateBeaSandar();
 
         // Kalkulasi total keseluruhan
         calculateGrandTotal(subtotal);
