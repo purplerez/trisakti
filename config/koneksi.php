@@ -7,6 +7,7 @@ class DatabaseConnection {
     // protected $db = 'trisakti';
     protected $user = 'root';
     protected $pass = '';
+    
     protected $db = 'trisakti';
     public $conn;
 
