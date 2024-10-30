@@ -2,10 +2,12 @@
 
 class DatabaseConnection {
     protected $server = 'localhost';
-    protected $user = 'root_rez';
-    protected $pass = 'ires123';
+    // protected $user = 'root_rez';
+    // protected $pass = 'ires123';
+    // protected $db = 'trisakti';
+    protected $user = 'root';
+    protected $pass = '';
     protected $db = 'trisakti';
-
     public $conn;
 
     public function __construct() {

@@ -2,7 +2,7 @@
 $server = 'localhost';
 $user = 'root';
 $pass = '';
-$db = 'trimas_db';
+$db = 'trisakti';
 $koneksi = mysqli_connect($server, $user, $pass, $db);
 
 if(!$koneksi){
