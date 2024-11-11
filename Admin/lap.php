@@ -138,9 +138,9 @@ $transaksi = new TransaksiController;
                     </thead>
                     <tbody>
                         <?php 
-                        $data = $transaksi->view_transaksi();
-                        $no = 1;
-                        foreach($data as $rec) {
+                            $data = $transaksi->view_transaksi(1);
+                            $no = 1;
+                            foreach($data as $rec) {
                         ?> 
                          <tr>
                             <td><?= $no ?></td>
@@ -148,7 +148,7 @@ $transaksi = new TransaksiController;
                             <td><?= $rec['jam'] ?></td>
                             <td><?= $rec['pelabuhan'] ?></td>
                             <td><?= $rec['trip'] ?></td>
-                            <td>Rp <?= number_format($rec['total_pendapatan'], 0, ',', '.') ?></td>
+                            <td>Rp <?= number_format($rec['total'], 0, ',', '.') ?></td>
                                 <form action="excel.php" method="post">
                                     <input type="hidden" name="id" value="<?= $rec['id'] ?>" />
                                 <td><input type="submit" value="Excel" name="download" class="btn btn-primary"></td>

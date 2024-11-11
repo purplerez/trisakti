@@ -81,10 +81,29 @@ class TransaksiController{
     }
     
     public function view_transaksi(){
-        $query = "SELECT t.tanggal,t.jam, t.pelabuhan, t.trip , t.id, SUM(d.total_pendapatan) AS total_pendapatan FROM tb_transaksi t
-                        LEFT JOIN tb_detail_trans d ON t.id = d.id_transaksi
-                        GROUP BY t.id";
+        // $query = "SELECT t.tanggal,t.jam, t.pelabuhan, t.trip , t.id, 
+        //                 (SELECT sum(detail.total_pendapatan) AS total_pengeluaran FROM tb_detail_trans detail 
+		// 									LEFT JOIN tb_jenistiket jenis ON detail.id_tiket = jenis.id
+		// 									WHERE detail.id_transaksi = t.id AND jenis.`status` = '0'  ) AS total_pengeluaran, 
+        //                 (SELECT sum(detail.total_pendapatan) AS total_pengeluaran FROM tb_detail_trans detail 
+		// 									LEFT JOIN tb_jenistiket jenis ON detail.id_tiket = jenis.id
+		// 									WHERE detail.id_transaksi = t.id AND jenis.`status` = '1'  ) AS total_pendapatan
+        //                 FROM tb_transaksi t
+        //                 LEFT JOIN tb_detail_trans d ON t.id = d.id_transaksi
+        //                 GROUP BY t.id";
 
+        $query = "SELECT t.tanggal, t.jam,  t.pelabuhan,  t.trip,  t.id,  
+                    SUM(CASE WHEN jenis.status = '1' THEN detail.total_pendapatan ELSE 0 END) -
+                    SUM(CASE WHEN jenis.status = '0' THEN detail.total_pendapatan ELSE 0 END) AS total
+                FROM 
+                    tb_transaksi t
+                LEFT JOIN 
+                    tb_detail_trans detail ON t.id = detail.id_transaksi
+                LEFT JOIN 
+                    tb_jenistiket jenis ON detail.id_tiket = jenis.id
+                GROUP BY 
+                    t.id, t.tanggal, t.jam, t.pelabuhan, t.trip
+                ";
 
         $result = $this->conn->query($query);
 
