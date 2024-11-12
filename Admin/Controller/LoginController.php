@@ -5,6 +5,8 @@ class LoginController{
 
     public function __construct()
     {
+        date_default_timezone_set('Asia/Jakarta');
+
         $db = new DatabaseConnection;
         $this->conn = $db->conn;
     }
@@ -21,9 +23,16 @@ class LoginController{
         if($result->num_rows == 1){
             $row = $result->fetch_assoc();
             $level = $row['level'];
-            return ['status'=>true, 'level' =>$level];
+            
+            // Update kolom last_login
+            $current_time = date('Y-m-d H:i:s'); // Waktu saat ini
+            $updateQuery = "UPDATE tb_user SET lastlogin = ? WHERE username = ?";
+            $updateStmt = $this->conn->prepare($updateQuery);
+            $updateStmt->bind_param("ss", $current_time, $username);
+            $updateStmt->execute();
+            
+            return ['status'=>true, 'level' => $level];
         }
         else return ['status'=> false];
     }
 }
-?>
