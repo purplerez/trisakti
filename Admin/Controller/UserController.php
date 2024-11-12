@@ -26,12 +26,13 @@ class UserController {
     }
 
     public function index(){
-        $query = "SELECT * FROM tb_user";
+    // Ambil kolom username, nama, level, dan last_login dari tabel tb_user
+    $query = "SELECT username, nama, level, lastlogin FROM tb_user";
 
-        $result = $this->conn->query($query);
+    $result = $this->conn->query($query);
 
-        if($result->num_rows > 0) return $result;
-        else return false;
+    if($result->num_rows > 0) return $result;
+    else return false;
     }
     
     public function delete($id){
