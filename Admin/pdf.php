@@ -6,11 +6,12 @@ require '../vendor/autoload.php';
 use Dompdf\Dompdf;
 
 $dompdf = new Dompdf();
+$imgData = base64_encode(file_get_contents('img/logo.png'));
 
 $html = '
-<img src="img/kapal.png" style="float: left; height: 60px">
+<img src="data:image/png;base64,' . $imgData . '" style="float: left; width: 100px">
 
-<div style="text-align: center; margin-top: 20px;">
+<div style="text-align: center; margin-top: 20px; margin-bottom: 30px">
     <div style="font-size: 18px">LAPORAN PRODUKSI KAPAL</div>
     <div style="font-size: 18px">KMP. TRIMAS LAILA</div>
 </div>
@@ -89,14 +90,14 @@ if ($stmt) {
         mysqli_data_seek($result_transaksi, 0);
 
         $html .= '
-        <div class="box" style="margin-top: 60px;">
+        <div class="box" style="margin-top: 30px;">
             <table width="100%" style="font-size: 17px;">
-                <tr style="margin-bottom: 15px;">
-                    <td width="13%" style="text-align: center; padding-bottom: 15px;">No</td>
-                    <td width="32%" style="text-align: center; padding-bottom: 15px;">Jenis Tiket</td>
-                    <td width="20%" style="text-align: center; padding-bottom: 15px;">Tarif</td>
-                    <td width="15%" style="text-align: center; padding-bottom: 15px;">Produksi</td>
-                    <td width="20%" style="text-align: center; padding-bottom: 15px;">Total</td>
+                <tr style="background-color: #88D66C">
+                    <td width="10%" style="text-align: center;">No</td>
+                    <td width="35%" style="text-align: center;">Jenis Tiket</td>
+                    <td width="20%" style="text-align: center;">Tarif</td>
+                    <td width="15%" style="text-align: center;">Produksi</td>
+                    <td width="20%" style="text-align: center; padding: 5px;">Total</td>
                 </tr>';
 
         
@@ -106,21 +107,21 @@ if ($stmt) {
             
             $html .= '
             <tr>
-                <td style="text-align: center; padding-bottom: 10px;">' . $no++ . '</td>
-                <td style="padding-bottom: 10px;">' . $data_transaksi['nama_tiket'] . '</td>
-                <td style="text-align: center; padding-bottom: 10px;">Rp ' . number_format($data_transaksi['tarif'], 0, ',', '.') . '</td>
-                <td style="text-align: center; padding-bottom: 10px;">' . $data_transaksi['produksi'] . '</td>
-                <td style="text-align: center; padding-bottom: 10px;">Rp ' . number_format($total, 0, ',', '.') . '</td>
+                <td style="text-align: center; padding: 5px;">' . $no++ . '</td>
+                <td style="padding: 5px;">' . $data_transaksi['nama_tiket'] . '</td>
+                <td style="padding: 5px 0px 5px 25px;">Rp ' . number_format($data_transaksi['tarif'], 0, ',', '.') . '</td>
+                <td style="text-align: center; padding: 5px;">' . $data_transaksi['produksi'] . '</td>
+                <td style="padding: 5px 0px 5px 20px;">Rp ' . number_format($total, 0, ',', '.') . '</td>
             </tr>';
         }
 
         $html .= '
-       <tr>
+       <tr style="background-color: #FFFF00">
             <td></td>
-            <td style="padding-bottom: 10px;">Subtotal</td>
+            <td style="padding: 5px;">Subtotal</td>
             <td></td>
             <td></td>
-            <td style="text-align: center; padding-bottom: 10px;">Rp ' . number_format($subtotal, 0, ',', '.') . '</td>
+            <td style="padding: 5px 0px 5px 20px;">Rp ' . number_format($subtotal, 0, ',', '.') . '</td>
         </tr>';
 
         mysqli_stmt_bind_param($stmt_trans, "i", $id_transaksi);
@@ -133,25 +134,25 @@ if ($stmt) {
             $subtotal_keluar += $total_keluar;
         $html .='
         <tr>
-            <td style="text-align: center; padding-bottom: 10px;">' . $no++ . '</td>
-            <td style="padding-bottom: 10px;">'. $rec['nama_tiket'] .'</td>
-            <td style="text-align: center; padding-bottom: 10px;">Rp '. number_format($rec['tarif'], 0, ',', '.') .'</td>
-            <td style="text-align: center; padding-bottom: 10px;">' . $rec['produksi'] . '</td>
-            <td style="text-align: center; padding-bottom: 10px;">'.number_format($total_keluar, 0, ',','.') .'</td>
+            <td style="text-align: center; padding: 5px;">' . $no++ . '</td>
+            <td style="padding: 5px;">'. $rec['nama_tiket'] .'</td>
+            <td style="padding: 5px 0px 5px 25px;">Rp '. number_format($rec['tarif'], 0, ',', '.') .'</td>
+            <td style="text-align: center; padding: 5px;">' . $rec['produksi'] . '</td>
+            <td style="padding: 5px 0px 5px 20px;">Rp '.number_format($total_keluar, 0, ',','.') .'</td>
         </tr>';
         }
 
         $html .=
         '
-        <tr>
+        <tr style="background-color: yellow">
             <td></td>
-            <td style="padding-bottom: 10px;">Total Pendapatan</td>
+            <td style="padding: 5px;">Total Pendapatan</td>
             <td></td>
             <td></td>
-            <td style="text-align: center; padding-bottom: 10px;">Rp ' . number_format($subtotal - $subtotal_keluar, 0, ',', '.') . '</td>
+            <td style="padding: 5px 0px 5px 20px;">Rp ' . number_format($subtotal - $subtotal_keluar, 0, ',', '.') . '</td>
         </tr>
         </table>
-        <p style="margin-top: 50px;">Yang membuat user</p>';
+        <p style="margin-top: 20px;">Yang membuat user</p>';
     } else {
         die('Query Error: ' . mysqli_error($koneksi));
     }
