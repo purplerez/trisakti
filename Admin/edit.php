@@ -51,7 +51,7 @@ if (isset($_GET['username'])) {
     $username = $_GET['username'];
     $query = "SELECT * FROM tb_user WHERE username = '$username'";
     $result = $koneksi->query($query);
-    // mysqli_query($koneksi, );
+    
     if (!$result) {
         die("Query error: " . mysqli_errno($koneksi) . " - " . mysqli_error($koneksi));
     }
@@ -95,10 +95,11 @@ if (isset($_GET['username'])) {
             <div class="sidebar">
                 <div class="header">
                     <div class="illustration">
-                        <img src="img/logo.png" alt="kapal" class="sidebar-img">
+                        <img src="img/lg.png" alt="kapal" class="sidebar-img">
                     </div>
                 </div>
                 <ul class="sidebar-nav">
+                    
                     <li class="sidebar-item">
                         <a href="db_admin.php" class="sidebar-link">
                         <i class="lni lni-home"></i>
@@ -138,6 +139,7 @@ if (isset($_GET['username'])) {
                             <span>Profile</span>
                         </a>
                     </li>
+
                 </ul>
                 <div class="sidebar-footer position-fixed bottom-0">
                     <a href="../logout.php" class="sidebar-link">
