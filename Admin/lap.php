@@ -149,7 +149,7 @@ $transaksi = new TransaksiController;
                             <td><?= $rec['pelabuhan'] ?></td>
                             <td><?= $rec['trip'] ?></td>
                             <td>Rp <?= number_format($rec['total'], 0, ',', '.') ?></td>
-                                <form action="excel.php" method="post">
+                                <form action="download.php" method="post">
                                     <input type="hidden" name="id" value="<?= $rec['id'] ?>" />
                                 <td><input type="submit" value="Excel" name="download" class="btn btn-primary"></td>
                                 </form>

@@ -1,9 +1,10 @@
 <?php
-require 'vendor/autoload.php'; // Menggunakan autoload Composer
+require '../vendor/autoload.php'; // Menggunakan autoload Composer
 include "support.php";
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 
 if(isset($_POST['id'])){
     $transaksi = new TransaksiController();
@@ -24,7 +25,7 @@ if(isset($_POST['id'])){
         // Mengisi data dari database
         $row = 2; // Mulai dari baris kedua
         while($row_data = $data->fetch_assoc()){
-            $sheet->setCellValue('A'.$row, $row_dat a['tanggal']);
+            $sheet->setCellValue('A'.$row, $row_data['tanggal']);
             $sheet->setCellValue('B'.$row, $row_data['jam']);
             $sheet->setCellValue('C'.$row, $row_data['pelabuhan']);
             $sheet->setCellValue('D'.$row, $row_data['trip']);
