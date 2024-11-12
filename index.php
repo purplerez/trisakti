@@ -16,11 +16,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['username'] = $username;
         $_SESSION['level'] = $row["level"];
 
-        if ($row["level"] == "0") {
+        if ($cek["level"] == "0") {
             header("Location: ./user/sidebar.php");
             exit();
         } 
-        else {
+        else if ($cek["level"] == "1" ) {
             header("Location: ./Admin/db_admin.php");
             exit();
         }
@@ -30,31 +30,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-    
-
-    // $sql = "SELECT * FROM tb_user WHERE username='$username'";
-    // $result = mysqli_query($koneksi, $sql);
-    // $row = mysqli_fetch_array($result);
-
-    // if ($row) {
-    //     if ($row["password"] === $password) {
-    //         $_SESSION['username'] = $username;
-    //         $_SESSION['level'] = $row["level"];
-
-    //         if ($row["level"] == "0") {
-    //             header("Location: ./user/sidebar.php");
-    //             exit();
-    //         } else {
-    //             header("Location: ./Admin/db_admin.php");
-    //             exit();
-    //         }
-    //     } else {
-    //         $error[] = 'Password Salah';
-    //     }
-    // } else {
-    //     $error[] = 'Username Tidak Ditemukan';
-    // }
-// }
 ?>
 
 <!doctype html>
