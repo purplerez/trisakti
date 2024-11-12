@@ -112,7 +112,7 @@ $transaksi = new TransaksiController;
                             <td><?= $rec['jam'] ?></td>
                             <td><?= $rec['pelabuhan'] ?></td>
                             <td><?= $rec['trip'] ?></td>
-                            <td>Rp <?= number_format($rec['total_pendapatan'], 0, ',', '.') ?></td>
+                            <td>Rp <?= number_format($rec['total'], 0, ',', '.') ?></td>
                             <td>
                                 <form action="download.php" method="post">
                                     <input type="hidden" name="id" value="<?= $rec['id'] ?>" />
