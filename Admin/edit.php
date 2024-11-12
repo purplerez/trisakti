@@ -100,12 +100,6 @@ if (isset($_GET['username'])) {
                 </div>
                 <ul class="sidebar-nav">
                     <li class="sidebar-item">
-                        <a href="edit.php?username=<?php echo $_SESSION['username']; ?>" class="sidebar-link">
-                            <i class="lni lni-user"></i>
-                            <span>Profile</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
                         <a href="db_admin.php" class="sidebar-link">
                         <i class="lni lni-home"></i>
                             <span>Dashboard</span>
@@ -138,6 +132,12 @@ if (isset($_GET['username'])) {
                         </a>
                     </li>
                     
+                    <li class="sidebar-item">
+                        <a href="edit.php?username=<?php echo $_SESSION['username']; ?>" class="sidebar-link">
+                            <i class="lni lni-user"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
                 </ul>
                 <div class="sidebar-footer position-fixed bottom-0">
                     <a href="../logout.php" class="sidebar-link">
