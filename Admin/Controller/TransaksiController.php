@@ -29,6 +29,28 @@ class TransaksiController{
         else return false;
     }
 
+    public function view_transaksi_by_date($tanggal) {
+        $query = "SELECT t.tanggal, t.jam, t.pelabuhan, t.trip, t.id,  
+                  SUM(CASE WHEN jenis.status = '1' THEN d.total_pendapatan ELSE 0 END) - 
+                  SUM(CASE WHEN jenis.status = '0' THEN d.total_pendapatan ELSE 0 END) AS total
+                  FROM tb_transaksi t
+                  LEFT JOIN tb_detail_trans d ON t.id = d.id_transaksi
+                  LEFT JOIN tb_jenistiket jenis ON d.id_tiket = jenis.id
+                  WHERE t.tanggal = ?
+                  GROUP BY t.id";
+    
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $tanggal);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        if ($result->num_rows > 0) {
+            return $result;
+        } else {
+            return false;
+        }
+    }
+       
     public function create($data, $jenis, $produksi){
         $tanggal = $data['tanggal'];
         $jam = $data['waktu'];
@@ -68,9 +90,10 @@ class TransaksiController{
             $params = [];
             foreach ($jenis as $index => $jns) {
                 $params[] = $jns;
-                $harga = $this->get_harga($jns);
-                $params[] = $produksi[$index];
-                $params[] = $harga*$produksi[$index];
+                $harga = (int) $this->get_harga($jns);
+                $jumlahProduksi = (int) $produksi[$index];
+                $params[] = $jumlahProduksi;
+                $params[] = $harga * $jumlahProduksi;
             }
             $detailStat->bind_param($types, ...$params);
             $result = $detailStat->execute();
@@ -81,17 +104,6 @@ class TransaksiController{
     }
     
     public function view_transaksi(){
-        // $query = "SELECT t.tanggal,t.jam, t.pelabuhan, t.trip , t.id, 
-        //                 (SELECT sum(detail.total_pendapatan) AS total_pengeluaran FROM tb_detail_trans detail 
-		// 									LEFT JOIN tb_jenistiket jenis ON detail.id_tiket = jenis.id
-		// 									WHERE detail.id_transaksi = t.id AND jenis.`status` = '0'  ) AS total_pengeluaran, 
-        //                 (SELECT sum(detail.total_pendapatan) AS total_pengeluaran FROM tb_detail_trans detail 
-		// 									LEFT JOIN tb_jenistiket jenis ON detail.id_tiket = jenis.id
-		// 									WHERE detail.id_transaksi = t.id AND jenis.`status` = '1'  ) AS total_pendapatan
-        //                 FROM tb_transaksi t
-        //                 LEFT JOIN tb_detail_trans d ON t.id = d.id_transaksi
-        //                 GROUP BY t.id";
-
         $query = "SELECT t.tanggal, t.jam,  t.pelabuhan,  t.trip,  t.id,  
                     SUM(CASE WHEN jenis.status = '1' THEN detail.total_pendapatan ELSE 0 END) -
                     SUM(CASE WHEN jenis.status = '0' THEN detail.total_pendapatan ELSE 0 END) AS total
@@ -104,6 +116,7 @@ class TransaksiController{
                 GROUP BY 
                     t.id, t.tanggal, t.jam, t.pelabuhan, t.trip
                 ";
+
 
         $result = $this->conn->query($query);
 
@@ -123,36 +136,67 @@ class TransaksiController{
 
     } 
 
-    public function edit($id){
-        // $query = "SELECT * FROM tb_transaksi WHERE id = $id";
-        // $result = $this->conn->query($query);
-
-        $stat = $this->conn->prepare("SELECT * FROM tb_transaksi WHERE id = ?");
-        $stat->bind_param("i", $id);
-
-        $result = $stat->execute();
-        $stat->close();
-
-        if($result) return true;
-        else return false;
-        // $query->close();
-
-        if($result->num_rows>0) return $result;
-        else return false;
+    public function edit($id) {
+        $query = "SELECT * FROM tb_transaksi WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        if ($result->num_rows > 0) {
+            return $result->fetch_assoc(); // Mengembalikan data dalam bentuk array
+        } else {
+            return false;
+        }
     }
-
-    public function update($data){
+    
+    public function update($data) {
         $id = $data['id'];
+        $tanggal = $data['tgl'];
+        $jam = $data['waktu'];
+        $trip = $data['trip'];
+        $pelabuhan = $data['pelabuhan'];
         $produksi = $data['produksi'];
-
-        $stmt = $this->conn->prepare("UPDATE tb_transaksi SET produksi = ? WHERE id = ?");
-        $stmt->bind_param("ii", $produksi, $id);
-
+        $idjenis = $data['idjenis'];
+    
+        // Update query untuk tb_transaksi
+        $stmt = $this->conn->prepare("UPDATE tb_transaksi SET tanggal = ?, jam = ?, trip = ?, pelabuhan = ? WHERE id = ?");
+        $stmt->bind_param("ssssi", $tanggal, $jam, $trip, $pelabuhan, $id);
+        
+        // Eksekusi update
         $result = $stmt->execute();
         $stmt->close();
-
-        if($result) return true;
-        else return false; 
+    
+        if ($result) {
+            // Hapus detail transaksi lama dan tambahkan yang baru
+            $this->delete_detail($id);
+            return $this->create_detail($id, $idjenis, $produksi);
+        } else {
+            return false;
+        }
+    }   
+    
+    public function getDetailTransaksi($id_transaksi) {
+        $query = "SELECT * FROM tb_detail_trans WHERE id_transaksi = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $id_transaksi);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        $details = [];
+        while ($row = $result->fetch_assoc()) {
+            $details[] = $row;
+        }
+    
+        $stmt->close();
+        return $details;
+    }
+    
+    private function delete_detail($id_transaksi) {
+        $stmt = $this->conn->prepare("DELETE FROM tb_detail_trans WHERE id_transaksi = ?");
+        $stmt->bind_param("i", $id_transaksi);
+        $stmt->execute();
+        $stmt->close();
     }
 
     public function validasi($data){
