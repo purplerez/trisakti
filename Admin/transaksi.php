@@ -30,6 +30,14 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
     <link rel="stylesheet" href="laporan.css">
 </head>
 <body>
+<?php
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$transaksiData = null;
+
+if ($id) {
+    $transaksiData = $transaksi->edit($id);
+}
+?>
     <div class="wrapper">
         <aside id="sidebar">
             
@@ -48,12 +56,6 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                     </div>
                 </div>
                 <ul class="sidebar-nav">
-                    <li class="sidebar-item">
-                        <a href="edit.php?username=<?php echo $_SESSION['username']; ?>" class="sidebar-link">
-                            <i class="lni lni-user"></i>
-                            <span>Profile</span>
-                        </a>
-                    </li>
                     <li class="sidebar-item">
                         <a href="db_admin.php" class="sidebar-link">
                         <i class="lni lni-home"></i>
@@ -86,7 +88,12 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                             <span>Data User</span>
                         </a>
                     </li>
-                    
+                    <li class="sidebar-item">
+                        <a href="edit.php?username=<?php echo $_SESSION['username']; ?>" class="sidebar-link">
+                            <i class="lni lni-user"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>         
                 </ul>
                 <div class="sidebar-footer position-fixed bottom-0">
                     <a href="../logout.php" class="sidebar-link">
@@ -112,11 +119,11 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                         <table>
                             <tr>
                                 <td><label>Tanggal</label></td>
-                                <td><input type="date" name="tgl" id=""></td>
+                                <td><input type="date" name="tgl" id="" value="<?= $transaksiData['tanggal'] ?? '' ?>" required></td>
                             </tr>
                             <tr>
                                 <td><label class="col-sm-1 col-form-label">Trip</label></td>
-                                <td><input type="text" name="trip" id=""></td>
+                                <td><input type="text" name="trip" id="" value="<?= $transaksiData['trip'] ?? '' ?>" required></td>
                             </tr>
                         </table>
                     </div>
@@ -125,11 +132,11 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                         <table>
                             <tr>
                                 <td><label>Pelabuhan</label></td>
-                                <td><input type="text" name="pelabuhan" id=""></td>
+                                <td><input type="text" name="pelabuhan" id="" value="<?= $transaksiData['pelabuhan'] ?? '' ?>" required></td>
                             </tr>
                             <tr>
                                 <td><label class="col-sm-1">Jam</label></td>
-                                <td><input type="time" name="waktu" id=""></td>
+                                <td><input type="time" name="waktu" id="" value="<?= $transaksiData['jam'] ?? '' ?>" required></td>
                             </tr>
                         </table>
                     </div>
@@ -149,7 +156,19 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                         <tbody>
                         <?php 
                         $no = 1;
-                        foreach($transaksi->index() as $rec) {
+
+                        // Mengambil detail produksi dari transaksi
+                        $produksiData = []; // Array untuk menyimpan data produksi berdasarkan id_tiket
+                        if (isset($_GET['id'])) {
+                            $id_transaksi = $_GET['id'];
+                            $details = $transaksi->getDetailTransaksi($id_transaksi); // Ambil detail transaksi
+
+                            foreach ($details as $detail) {
+                                $produksiData[$detail['id_tiket']] = $detail['produksi']; // Simpan produksi berdasarkan id_tiket
+                            }
+                        }
+
+                        foreach ($transaksi->index() as $rec) {
                             // Example condition to check for Golongan VII
                             if ($rec['nama_tiket'] === 'Golongan VII') {
                                 ?>
@@ -165,7 +184,9 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                                 <td><?= htmlspecialchars($rec['nama_tiket']) ?></td>
                                 <td>Rp <?= number_format($rec['tarif'], 0, ',', '.') ?></td>
                                 <td>
-                                    <input type="number" name="produksi[]" class="produksi-input" data-tarif="<?= $rec['tarif'] ?>" required>
+                                    <input type="number" name="produksi[]" class="produksi-input" 
+                                        value="<?= isset($produksiData[$rec['id']]) ? $produksiData[$rec['id']] : '' ?>" 
+                                        data-tarif="<?= $rec['tarif'] ?>" required>
                                     <input type="hidden" name="idjenis[]" value="<?= $rec['id'] ?>">
                                 </td>
                                 <td class="pendapatan">Rp 0</td>
@@ -174,60 +195,66 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
                         }
                         ?>
                         </tbody>
-                    <tfoot>
-                    <tr>
-                        <th></th>
-                        <th colspan="3">Subtotal</th>
-                        <th id="total-pendapatan">Rp 0</th>
-                    </tr>
-                    <?php 
-                        foreach($transaksi->index(0) as $data) {
-                    ?>
-                    <tr>
-                        <td><?= $no++ ?></td>
-                        <td><?= $data['nama_tiket'] ?></td>
-                        
-                        <?php 
-                            if($data['nama_tiket'] == 'Bea Cetak'){
-                        ?>
-                        <td id="tarif-bea-cetak"> Rp  <?= number_format($data['tarif'], 0, ',', '.') ?> <input type="hidden" name="produksi[]" id="produksiCetak" value=""></td>
-                        <input type="hidden" name="idjenis[]" value="<?= $data['id'] ?>">
-                            <td id="total-produksi-bea-cetak">0</td>
-                            <td id="total-bea-cetak">Rp 0</td>
-                        <?php } 
-                        else { ?>
-                        <td id="tarif-bea-sandar"> Rp  <?= number_format($data['tarif'], 0, ',', '.') ?></td>
-                            <td><input type="number" id="total-produksi-bea-sandar" name="produksi[]">
-                            <input type="hidden" name="idjenis[]" value="<?= $data['id'] ?>"></td>
-                            <td id="total-bea-sandar">Rp 0</td>
-                        <?php 
-                        } 
-                        ?>
-                        
-                    </tr>
-                    <?php } ?>
-                    <!-- <tr>
-                        <td><?= $no++ ?></td>
-                        <td>Bea Sandar</td>
-                        <td id="beasandar-value">345.690</td>
-                        <td><input type="number" id="total-produksi-bea-sandar"></td>
-                        
-                    </tr> -->
-                    <tr>
-                        <th></th>
-                        <th colspan="3">Total Pendapatan</th>
-                        <th id="total-keseluruhan">Rp 0</th>
-                    </tr>
-                </tfoot>
-
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th colspan="3">Subtotal</th>
+                                <th id="total-pendapatan">Rp 0</th>
+                            </tr>
+                            <?php 
+                                foreach ($transaksi->index(0) as $data) {
+                            ?>
+                            <tr>
+                                <td><?= $no++ ?></td>
+                                <td><?= $data['nama_tiket'] ?></td>
+                                
+                                <?php 
+                                    if ($data['nama_tiket'] == 'Bea Cetak') {
+                                ?>
+                                    <td id="tarif-bea-cetak"> Rp <?= number_format($data['tarif'], 0, ',', '.') ?> 
+                                        <input type="hidden" name="produksi[]" id="produksiCetak" value="<?= isset($produksiData[$data['id']]) ? $produksiData[$data['id']] : 0 ?>">
+                                    </td>
+                                    <input type="hidden" name="idjenis[]" value="<?= $data['id'] ?>">
+                                    <td id="total-produksi-bea-cetak">0</td>
+                                    <td id="total-bea-cetak">Rp 0</td>
+                                <?php 
+                                    } else { 
+                                ?>
+                                    <td id="tarif-bea-sandar"> Rp <?= number_format($data['tarif'], 0, ',', '.') ?></td>
+                                    <td>
+                                        <input type="number" id="total-produksi-bea-sandar" name="produksi[]" 
+                                            value="<?= isset($produksiData[$data['id']]) ? $produksiData[$data['id']] : 0 ?>" required>
+                                        <input type="hidden" name="idjenis[]" value="<?= $data['id'] ?>">
+                                    </td>
+                                    <td id="total-bea-sandar">Rp 0</td>
+                                <?php 
+                                    } 
+                                ?>
+                                
+                            </tr>
+                            <?php } ?>
+                            <tr>
+                                <th></th>
+                                <th colspan="3">Total Pendapatan</th>
+                                <th id="total-keseluruhan">Rp 0</th>
+                            </tr>
+                        </tfoot>
                     </table>
+                    
                 </div>
                 <div class="create">
                     <p>Yang membuat <?php echo $_SESSION["username"] ?></p>
                 </div>
 
                 <div class="trans">
-                   <center> <button type="submit" name="inputTransaksi">Simpan</button></center>
+                    <center>
+                        <?php if(isset($_GET['id'])) { ?>
+                            <input type="hidden" name="id" value="<?= $id ?>">
+                            <button type="submit" name="updateLap" class="btn btn-warning">Simpan</button>
+                        <?php } else { ?> 
+                            <button type="submit" name="inputTransaksi" class="btn btn-primary">Simpan</button>
+                        <?php } ?>
+                    </center>
                 </div>
             </form>
         </div>
@@ -238,57 +265,7 @@ $stmt = $conn->query('SELECT id, nama_tiket, tarif FROM tb_jenistiket');
         crossorigin="anonymous"></script>
 
     <script src="side.js"></script>
-    <!-- <script>
-    document.addEventListener('DOMContentLoaded', function () {
-    // Event listener untuk input produksi
-    document.querySelectorAll('.produksi-input').forEach(function(input) {
-        input.addEventListener('input', hitungTotal);
-    });
 
-    // Event listener untuk input Bea Sandar
-    document.getElementById('total-produksi-bea-sandar').addEventListener('input', hitungTotal);
-
-    function hitungTotal() {
-        let totalPendapatan = 0;
-        let totalProduksi = 0;
-
-        // Hitung total pendapatan dan total produksi
-        document.querySelectorAll('.produksi-input').forEach(function(input) {
-            let tarif = parseFloat(input.getAttribute('data-tarif'));
-            let produksi = parseFloat(input.value) || 0;
-            let total = tarif * produksi;
-            input.closest('tr').querySelector('.pendapatan').innerText = 'Rp ' + total.toLocaleString();
-            totalPendapatan += total;
-            totalProduksi += produksi;
-        });
-
-        // Bea Cetak
-        let beaCetakPerProduksi = 90; // Nilai tetap per produksi untuk Bea Cetak
-        let beaCetak = beaCetakPerProduksi * totalProduksi;
-
-        // Bea Sandar
-        let beaSandarRate = parseFloat(document.getElementById('beasandar-value').innerText.replace(/[^0-9]/g, '')) || 0;
-        let beaSandarInput = parseFloat(document.getElementById('total-produksi-bea-sandar').value) || 0;
-        let beaSandar = beaSandarRate * beaSandarInput;
-
-        // Hitung total biaya
-        let totalBiaya = beaCetak + beaSandar;
-
-        // Hitung total keseluruhan
-        let totalKeseluruhan = totalPendapatan - totalBiaya;
-
-        // Update tampilan
-        document.getElementById('total-pendapatan').innerText = 'Rp ' + totalPendapatan.toLocaleString();
-        document.getElementById('total-produksi-bea-cetak').innerText = totalProduksi;
-        document.getElementById('total-bea-cetak').innerText = 'Rp ' + beaCetak.toLocaleString();
-        document.getElementById('total-bea-sandar').innerText = 'Rp ' + beaSandar.toLocaleString();
-        document.getElementById('total-keseluruhan').innerText = 'Rp ' + totalKeseluruhan.toLocaleString();
-    }
-
-    // Inisialisasi kalkulasi saat halaman dimuat
-    hitungTotal();
-});
-</script> -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     // Event listener untuk input produksi
